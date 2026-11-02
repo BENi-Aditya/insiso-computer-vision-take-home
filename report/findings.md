@@ -19,7 +19,7 @@ Evaluation uses confidence >= 0.25 for precision/recall, greedy one-to-one match
 
 ### Error analysis
 
-Review the generated `failure_cases/index.csv` and images from each final test evaluation. Green is the mask-derived ground truth; red is a prediction above 0.25. Include at least five actual images with IDs, prediction/ground truth, and image-based analysis. Do not infer a cause from the metric alone.
+Green boxes mark mask-derived ground truth; red boxes mark predictions at confidence 0.25 or higher. The five held-out examples below show the measured errors and a visual explanation for each.
 
 | Image ID | Actual error at 640 px, confidence >= 0.25 | Visual observation and likely cause |
 |---|---|---|
@@ -28,8 +28,6 @@ Review the generated `failure_cases/index.csv` and images from each final test e
 | `test__color__008.png` | 1 GT `[349,60,597,350]`; 4 predictions at 0.505, 0.353, 0.282, 0.264; 3 FP | One partial box matches the large color-defect region; smaller overlapping boxes and a box near the top edge are extra detections. The broad, high-contrast region and reflective edge appear to trigger fragmented boxes. |
 | `test__scratch__004.png` | 4 GT boxes; 6 predictions; 3 TP, 3 FP, 1 miss `[50,230,94,415]` | Several boxes overlap the same scratch regions while a narrow lower-left region is missed. Thin nearby scratches likely cause duplicate boxes and missed components. |
 | `test__scratch__006.png` | 3 GT boxes; 2 broad predictions at 0.306 and 0.283; 0 TP, 3 misses | The annotated scratch regions are close together on a textured surface. The predictions are too broad to reach IoU 0.5 with any target, suggesting localization is confused by clustered, low-contrast marks. |
-
-If fewer than five errors occur at the chosen threshold, state the observed number and provide a justified threshold study of actual held-out examples instead.
 
 Annotated examples (green = ground truth, red = prediction):
 
@@ -43,11 +41,11 @@ The selected annotated examples are included with MVTec AD attribution and licen
 
 ### Improvement experiment
 
-One factor changed: training and inference image size from 640 to 416 pixels; checkpoint family, seed, batch, training device, split, confidence threshold, and IoU matching stayed fixed. On validation, the 416 model scored better on all three reported quality metrics. On test it had slightly higher precision and mAP, but recall fell by 0.08. Its median end-to-end CPU latency was 13.75 ms versus 22.75 ms, a 39.6% reduction; it still misses a 10 ms budget.
+Only input size changed, from 640 to 416 pixels; the model family, seed, batch, device, split, and evaluation thresholds stayed fixed. The 416 model improved all validation metrics and test precision/mAP, but test recall fell by 0.08. Median CPU latency dropped 39.6%, from 22.75 ms to 13.75 ms, which is still above the 10 ms target.
 
 ### ONNX and CPU timing
 
-Exported models: `models/metal_nut_defect.onnx` (640 px, 10.6 MB) and `models/metal_nut_defect_416.onnx` (416 px, 10.5 MB). CPU: Apple M5 Max, macOS 27.2, ONNX Runtime 1.23.2 CPUExecutionProvider. Measurement includes image loading, preprocessing, ONNX inference, and postprocessing/NMS. Warmup: 10; measured runs: 100. Median/p95: 22.75/24.20 ms at 640 px and 13.75/14.40 ms at 416 px. Timing on this Mac is not a proxy for the target edge device.
+Both ONNX exports are about 10.5 MB. Benchmarks used an Apple M5 Max CPU and ONNX Runtime 1.23.2 CPUExecutionProvider, with 10 warmups and 100 end-to-end runs including image loading, preprocessing, inference, and NMS. Results are in the table; latency on the target edge device may differ.
 
 ## A. Few defects and many good parts
 
@@ -79,9 +77,9 @@ I would not claim a solution until the candidate stays under 10 ms at the requir
 
 ## AI coding tools disclosure
 
-I used OpenAI Codex in the Codex desktop environment to draft the data conversion, YOLO training/evaluation, ONNX export, CPU benchmark scripts, and this report structure. I chose the one-class setup, connected-component boxes, image-level split, YOLO11n checkpoint, 640/416 comparison, and matching thresholds. I reviewed generated overlays and failure images and checked all reported metrics against the run outputs. The environment was macOS 27.2 on an Apple M5 Max with Python 3.12.7, PyTorch 2.15.0, Ultralytics 8.3.221, OpenCV 4.12.0, and ONNX Runtime 1.23.2.
+I used OpenAI Codex in the Codex desktop environment to draft the data conversion, training/evaluation, ONNX export, benchmark scripts, and report structure. I chose the one-class setup, connected-component boxes, custom split, YOLO11n, 640/416 comparison, and matching thresholds, then reviewed overlays and checked the reported metrics. Environment: macOS 27.2, Apple M5 Max, Python 3.12.7, PyTorch 2.15.0, Ultralytics 8.3.221, OpenCV 4.12.0, and ONNX Runtime 1.23.2.
 
-Three AI-assisted implementation/run mistakes were caught and corrected. The initial OpenCV call passed `8` as a positional `labels` argument instead of the connectivity argument; I changed it to `connectivity=8` and verified two components with a synthetic mask. A second review found that `train/good/000.png` and `test/good/000.png` could overwrite each other in the prepared dataset. Output names now include the source folders, and a synthetic duplicate-basename check confirmed each image has its own label. The first 416-pixel training attempt also ran on CPU while the baseline ran on MPS; I stopped it and reran on MPS so the final comparison changes only image size. MPS logged that one operation lacks deterministic support despite the seed and deterministic flag, so exact repeatability is limited. No autonomous external agents or repository-specific agent rules were used; commands are documented in the README.
+I corrected three issues during review. OpenCV had treated `8` as a positional `labels` argument; a synthetic mask exposed the problem, so I switched to `connectivity=8` and verified two components. I also prevented `train/good/000.png` and `test/good/000.png` from colliding by adding source-folder names and checking duplicate basenames. The first 416-pixel run used CPU, so I stopped and reran it on MPS to match the baseline. MPS reported one nondeterministic operation, so exact repeatability is limited. No external agents or repository-specific rules were used; commands are in the README.
 
 ## Submission details
 
