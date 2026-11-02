@@ -1,0 +1,14 @@
+/.venv/
+/.ultralytics/
+/.matplotlib/
+__pycache__/
+*.py[cod]
+.DS_Store
+.claude/
+InSiSo_Computer_Vision_Take_Home_Project_Brief.pdf
+data/
+runs/
+models/*.pt
+results/generated/
+yolo11n.pt
+Metal Nut.tar.xz
