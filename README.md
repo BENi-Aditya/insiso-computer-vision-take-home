@@ -73,6 +73,7 @@ Both were trained with seed 42 on MPS and selected by validation. Lowering resol
 
 - `scripts/`: mask conversion, train, evaluate, ONNX export and CPU benchmark.
 - `report/findings.md`: submission report, metrics table, failure-case review, A/B/C responses and AI-use disclosure.
+- `output/pdf/metal-nut-defect-findings.pdf`: formatted report ready to attach to the submission email.
 - `report/failure_cases/`: five reviewed annotated failure images and dataset attribution.
 - `models/metal_nut_defect.onnx` and `models/metal_nut_defect_416.onnx`: exported models included as repository deliverables.
 - `results/generated/`: full run outputs; ignored by git by default. Five selected annotated failure examples are included with attribution under `report/failure_cases/`.

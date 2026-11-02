@@ -1,6 +1,6 @@
 # Metal nut defect detector: findings
 
-Prepared for InSiSo Technologies Computer Vision Intern take-home. The results below come from executed runs in this repository. The model was trained and evaluated on a custom split of MVTec AD; these are not official benchmark results.
+Prepared by Aditya Tripathi for the InSiSo Technologies Computer Vision Intern take-home. The results below come from executed runs in this repository. The model was trained and evaluated on a custom split of MVTec AD; these are not official benchmark results.
 
 ## Method
 
