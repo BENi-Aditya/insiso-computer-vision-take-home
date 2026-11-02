@@ -85,4 +85,4 @@ This is a small single-class detector trained on a custom partition of a laborat
 
 - Education: first-year undergraduate student pursuing BITS Pilani CSE (BSc Hons) and CS & AI at Scaler School of Tech; expected graduation in 2030 for both.
 - Earliest available start date: 7 January 2027, after returning to Bengaluru from winter break.
-- Repository: [BENi-Aditya/insiso-computer-vision-take-home](https://github.com/BENi-Aditya/insiso-computer-vision-take-home) (private; reviewer access has not been shared).
+- Repository: [BENi-Aditya/insiso-computer-vision-take-home](https://github.com/BENi-Aditya/insiso-computer-vision-take-home) (public).
